@@ -29,7 +29,7 @@ https-server rest access-mode read-write
 https-server vrf mgmt
 
 
-Cited Resource
+Cited Resource to build these script
     # https://github.com/aruba/aoscx-ansible-role
     # http://www.nettinkerer.org/using-ansible-to-create-config-files/
     # https://github.com/dmahler/ansible-template
