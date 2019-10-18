@@ -1,0 +1,11 @@
+
+# Config Builder
+---
+- name: Upload File to the AOS CX Switch
+  tasks:
+    - name: Backup Configuration
+      arubaos_cx_ssh_cli:
+        ip: "{{ip | default(ansible_host)}}"
+        user: "{{user | default(ansible_user)}}"
+        password: "{{password | default(ansible_password)}}"
+        commands: ["copy tftp://{{tftp_server}}/{{temp_config_file}} running-config vrf mgmt"]

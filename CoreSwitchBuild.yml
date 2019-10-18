@@ -1,0 +1,16 @@
+---
+- name: Build Core Switch Config and Upload to device
+  hosts: all
+  gather_facts: no
+  roles:
+   - CoreSwitch
+
+#  tasks:
+#  - name: Upload Configuration
+#    delegate_to: all
+#    arubaos_cx_ssh_cli:
+#      ip: 192.168.56.108
+#      user: admin
+#      password: aruba123
+      # Commands as a list
+#      commands: ["copy tftp://192.168.56.1/{{ ansible_hostname }}.cfg running-config vrf mgmt"]

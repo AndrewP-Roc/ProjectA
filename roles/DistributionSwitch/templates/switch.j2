@@ -1,0 +1,81 @@
+# Config for {{ item.ansible_hostname }}
+hostname DTSW-{{ item.ansible_hostname|upper }}-001
+banner motd !
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+>>>                                              >>>
+>>>         Authorised Access Only               >>>
+>>> Logout now if you are not an authorised user >>>
+>>>                                              >>>
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>!
+user admin group administrators password plaintext {{ item.local_password }}
+no ip icmp redirect
+clock timezone utc
+ntp server 10.3.0.2
+ntp enable
+!
+logging {{ syslog_server }}
+snmp-server vrf default
+snmp-server system-location {{ item.system_location }}
+snmpv3 user ROC-SOLARWINDS auth md5 auth-pass plaintext {{ item.snmp_auth }}  priv aes priv-pass plaintext {{ item.snmp_priv }}
+snmpv3 context NETWORK-MGMT vrf default
+snmpv3 user ROC-SOLARWINDS context NETWORK-MGMT
+ssh server vrf mgmt
+ip prefix-list Block-KA seq 10 deny {{ item.mgmt_ip }} ge 32 le 32
+!
+!
+!
+!
+route-map Block-KA deny seq 10
+     match ip address prefix-list Block-KA
+!
+{% for vlan in item.vlans %}
+vlan {{ vlan.number }}
+    name {{ vlan.name }}
+{% endfor %}
+!
+{% for vlan in item.vlans %}
+interface vlan {{ vlan.number }}
+    ip address 10.{{ item.site_id }}.{{ vlan.ip }}
+    name {{ vlan.name }}
+    
+{% endfor %}
+!
+vlan 901
+    name vrf-def
+    vsx-sync
+    description VSX-L3
+!
+spanning-tree
+spanning-tree priority 0
+spanning-tree config-name Region-One
+spanning-tree config-revision 1
+system interface-group 1 speed 10g
+!
+{% for mclag in item.mclags %}
+interface lag {{ mclag.lag_id }}
+  no shutdown
+  no routing
+  vlan trunk native 1
+  vlan trunk allowed 100,10{{ mclag.lag_id }},20{{ mclag.lag_id }},30{{ mclag.lag_id }}
+  lacp mode active
+  loop-protect
+  description Link-To-Stack-{{ mclag.lag_id }}
+{% endfor %}
+!
+interface lopback0
+    ip address {{ item.mgmt_ip }}
+interface lag 250
+    vsx-sync vlans
+    no shutdown
+    no routing
+    vlan trunk native 1 tag
+    vlan trunk allowed all
+    lacp mode active
+!
+router bgp 650{{ item.site_id }}
+  bgp timers 10 30
+  bgp fast-external-failover
+{% for peer in item.bgp_peers %}
+  neighbor {{ peer.neighbor_ip }}
+  neighbor {{ peer.neighbor_ip }} remote-as {{ peer.peer_asn}}
+{% endfor %}

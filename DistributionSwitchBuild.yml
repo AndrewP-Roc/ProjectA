@@ -1,0 +1,7 @@
+---
+- name: Apply dist role
+  gather_facts: no
+  hosts: localhost
+
+  roles:
+   - DistributionSwitch

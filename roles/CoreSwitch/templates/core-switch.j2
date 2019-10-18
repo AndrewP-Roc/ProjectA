@@ -1,0 +1,192 @@
+# Config for {{ item.ansible_hostname }}
+hostname ccsw-{{ item.ansible_hostname|lower }}-001
+banner motd !
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+>>>                                              >>>
+>>>         Authorised Access Only               >>>
+>>> Logout now if you are not an authorised user >>>
+>>>                                              >>>
+>>>  This system is managed under configuration  >>>
+>>>   control, any changes will be overwritten   >>>
+>>>                                              >>>
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>!
+user admin group administrators password plaintext {{ item.local_password }}
+no ip icmp redirect
+clock timezone utc
+ntp server 10.3.0.2
+ntp enable
+!
+{% for int in item.vrf_instant %}
+vrf {{ int.vrf }}
+{% endfor %}
+!
+logging {{ syslog_server }}
+snmp-server vrf default
+snmp-server system-location {{ item.system_location }}
+snmpv3 user ROC-SOLARWINDS auth md5 auth-pass plaintext {{ snmp_auth }}  priv aes priv-pass plaintext {{ snmp_priv }}
+snmpv3 context NETWORK-MGMT vrf default
+snmpv3 user ROC-SOLARWINDS context NETWORK-MGMT
+ssh server vrf mgmt
+!
+!
+{% for item in item.vrf_instant %}
+{% if item.vrf_ospf_ver == "v6" %}
+router ospf {{ item.ospf_process }} vrf {{ item.vrf }}
+    router-id {{ item.vrf_rid }}
+    area 0.0.0.0
+router ospfv3 {{ item.ospfv3_process }} vrf {{ item.vrf }}
+    router-id {{ item.vrf_rid }}
+    area 0.0.0.0
+{% else %}
+router ospf {{ item.ospf_process }} vrf {{ item.vrf }}
+    router-id {{ item.vrf_rid }}
+    area 0.0.0.0
+{% endif %}
+{% endfor %}
+!
+{% for item in item.vlan_interfaces %}
+vlan {{ item.vlan_if_no }}
+    name **V{{ item.vlan_if_no }}-{{ item.vrf_name }}-{{ item.remote_switch }}**
+{% endfor %}
+!
+{% for loopback in item.vrf_instant %}
+interface loopback {{ loopback.ospf_loopback }}
+    vrf attach {{ loopback.vrf }}
+{% if loopback.vrf_ospf_ver == "v6" %}
+    ip address {{ loopback.vrf_mgmt_ipv4 }}/32
+    ip ospf {{ loopback.ospf_process }} area 0.0.0.0
+    ipv6 address {{ loopback.vrf_mgmt_ipv6 }}/128
+    ipv6 ospfv3 {{ loopback.ospfv3_process }} area 0.0.0.0
+{% else %}
+    ip address {{ loopback.vrf_mgmt_ipv4 }}/32
+    ip ospf {{ loopback.ospf_process }} area 0.0.0.0
+{% endif %}
+{% endfor %}
+!
+{% for int in item.vlan_interfaces %}
+{% if int.vlan_int_ipv6|length %}
+interface vlan{{ int.vlan_if_no }}
+    vrf attach {{ int.vrf_name }}
+    description **V{{ int.vlan_if_no }}-{{ int.vrf_name }}-{{ int.remote_switch }}**
+    ip address {{ int.vlan_int_ipv4 }}
+    ip ospf {{ int.vrf_ospf_process }} area 0.0.0.0
+    ip ospf network point-to-point
+    ipv6 address {{ int.vlan_int_ipv6 }}
+    ipv6 ospfv3 {{ int.vrf_ospfv3_process }} area 0.0.0.0
+    ipv6 ospfv3 network point-to-point
+{% else %}
+interface vlan{{ int.vlan_if_no }}
+    vrf attach {{ int.vrf_name }}
+    description **V{{ int.vlan_if_no }}-{{ int.vrf_name }}-{{ int.remote_switch }}**
+    ip address {{ int.vlan_int_ipv4 }}
+    ip ospf {{ int.vrf_ospf_process }} area 0.0.0.0
+    ip ospf network point-to-point
+{% endif %}
+{% endfor %}
+!
+router bgp 65001
+    bgp router-id {{ item.mgmt_ipv4 }}
+    timers bgp 10 30
+    bgp log-neighbor-changes
+    bgp fast-external-fallover
+    neighbor CampusCoreIPv4 peer-group
+    neighbor CampusCoreIPv4 remote-as 65001
+    neighbor CampusCoreIPv6 peer-group
+    neighbor CampusCoreIPv6 remote-as 65001
+{% for neighbor in item.bgp_rr_peer %}
+    neighbor {{ neighbor.bgp_ipv4 }} peer-group CampusCoreIPv4
+    neighbor {{ neighbor.bgp_ipv4 }} description {{ neighbor.bgp_peer_name }}
+{% endfor %}
+{% for neighbor in item.bgp_rc_peer %}
+    neighbor {{ neighbor.bgp_ipv4 }} peer-group CampusCoreIPv4
+    neighbor {{ neighbor.bgp_ipv4 }} description {{ neighbor.bgp_peer_name }}
+{% endfor %}
+{% for neighbor in item.bgp_ind_peer %}
+    neighbor {{ neighbor.bgp_ipv4 }} remote-as {{ neighbor.bgp_remote_as }}
+    neighbor {{ neighbor.bgp_ipv4 }} description {{ neighbor.bgp_peer_name }}
+{% endfor %}
+{% for neighbor in item.bgp_rr_peer %}
+{% if neighbor.bgp_ipv6 is defined and neighbor.bgp_ipv6|length %}
+    neighbor {{ neighbor.bgp_ipv6 }} peer-group CampusCoreIPv6
+    neighbor {{ neighbor.bgp_ipv6 }} description {{ neighbor.bgp_peer_name }}
+    neighbor {{ neighbor.bgp_ipv6 }} send-community
+{% endif %}
+{% endfor %}
+{% for neighbor in item.bgp_rc_peer %}
+{% if neighbor.bgp_ipv6 is defined and neighbor.bgp_ipv6|length %}
+    neighbor {{ neighbor.bgp_ipv6 }} peer-group CampusCoreIPv6
+    neighbor {{ neighbor.bgp_ipv6 }} description {{ neighbor.bgp_peer_name }}
+    neighbor {{ neighbor.bgp_ipv6 }} send-community
+{% endif %}
+{% endfor %}
+{% for neighbor in item.bgp_ind_peer %}
+{% if neighbor.bgp_ipv6 is defined and neighbor.bgp_ipv6|length %}
+    neighbor {{ neighbor.bgp_ipv6 }} remote-as {{ neighbor.bgp_remote_as }}
+    neighbor {{ neighbor.bgp_ipv6 }} description {{ neighbor.bgp_peer_name }}
+{% endif %}
+{% endfor %}
+    address-family ipv4 unicast
+        neighbor CampusCoreIPv4 route-reflector-client
+        neighbor CampusCoreIPv4 send-community
+        neighbor CampusCoreIPv4 advertisement-interval 3
+{% for neighbor in item.bgp_rr_peer %}
+        neighbor {{ neighbor.bgp_ipv4 }} activate
+{% endfor %}
+{% for neighbor in item.bgp_rc_peer %}
+        neighbor {{ neighbor.bgp_ipv4 }} activate
+{% endfor %}
+{% for neighbor in item.bgp_ind_peer %}
+        neighbor {{ neighbor.bgp_ipv4 }} activate
+{% endfor %}
+        redistribute connected
+    exit-address-family
+    address-family ipv6 unicast
+        neighbor CampusCoreIPv6 route-reflector-client
+        neighbor CampusCoreIPv6 advertisement-interval 3
+{% for neighbor in item.bgp_rr_peer %}
+        neighbor {{ neighbor.bgp_ipv6 }} activate
+{% endfor %}
+{% for neighbor in item.bgp_rc_peer %}
+        neighbor {{ neighbor.bgp_ipv6 }} activate
+{% endfor %}
+{% for neighbor in item.bgp_ind_peer %}
+        neighbor {{ neighbor.bgp_ipv6 }} activate
+{% endfor %}
+        redistribute connected
+    exit-address-family
+!
+vrf vrf-bce
+    neighbor CampusCoreIPv4 peer-group
+    neighbor CampusCoreIPv4 remote-as 65001
+    neighbor CampusCoreIPv6 peer-group
+    neighbor CampusCoreIPv6 remote-as 65001
+    neighbor CampusCoreIPv4 peer-group
+{% for item in item.bgp_vrf_bce %}
+{% if item.bgp_peer_ipv6 is defined and item.bgp_peer_ipv6|length %}
+    neighbor {{ item.bgp_peer_ipv6 }} peer-group CampusCoreIPv6
+    neighbor {{ item.bgp_peer_ipv6 }} description {{ item.bgp_peer_name }}
+{% endif %}
+    neighbor {{ item.bgp_peer_ipv4 }} peer-group CampusCoreIPv4
+    neighbor {{ item.bgp_peer_ipv4 }} description {{ item.bgp_peer_name }}
+{% endfor %}
+    address-family ipv4 unicast
+        neighbor CampusCoreIPv4 route-reflector-client
+        neighbor CampusCoreIPv4 send-community
+        neighbor CampusCoreIPv4 advertisement-interval 3
+{% for item in item.bgp_vrf_bce %}
+        neighbor {{ item.bgp_peer_ipv4 }} activate
+{% endfor %}
+    redistribute connected
+    exit-address-family
+{% if item.bgp_peer_ipv6 is defined and item.bgp_peer_ipv6|length %}
+    address-family ipv6 unicast
+        neighbor CampusCoreIPv6 route-reflector-client
+        neighbor CampusCoreIPv6 send-community
+        neighbor CampusCoreIPv6 advertisement-interval 3
+{% for item in item.bgp_vrf_bce %}
+        neighbor {{ item.bgp_peer_ipv6 }} activate
+{% endfor %}
+        redistribute connected
+    exit-address-family
+{% endif %}
+!

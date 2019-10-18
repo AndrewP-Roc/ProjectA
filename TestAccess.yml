@@ -1,0 +1,11 @@
+---
+- name: Test Access - Change the hostname
+  hosts: all
+  gather_facts: no
+  tasks:
+  - name: Change the Hostname
+    arubaos_cx_ssh_cli:
+      ip: 192.168.56.108
+      user: admin
+      password: Aruba123
+      commands: ["conf", "hostname {{ ansible_hostname }}"]

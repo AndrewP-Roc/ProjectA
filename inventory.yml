@@ -1,0 +1,11 @@
+#localhost ansible_connection=local
+---
+all:
+  children:
+    branch1:
+      vars:
+        ansible_connection: local  # Do not change
+      hosts:
+        reynolds:
+          ansible_host: 192.168.56.108
+          hostname: core1

@@ -1,0 +1,7 @@
+# https://github.com/dmahler/ansible-template
+# Config Builder
+---
+- name: Generate configuration files
+  delegate_to: localhost
+  template: src={{ item.profile }}.j2 dest=/root/ProjectA/configs/{{ item.ansible_hostname }}.cfg
+  with_items: "{{ switches }}"

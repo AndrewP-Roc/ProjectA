@@ -1,0 +1,45 @@
+---
+switches:
+  - ansible_hostname: aglc
+    local_password: aruba123
+    system_location: "Alan Gilbert Learning Commons"
+    snmp_auth: password1
+    snmp_priv: password1
+    mgmt_ip: 10.10.0.5
+    profile: switch
+    switch_role: primary
+    switch_group: group1
+    site_id: 12
+    bgp_asn: 65012
+    vlans:
+      - number: 101
+        name: data-1-default
+        ip: 101.253/24
+      - number: 102
+        name: data-2-default
+        ip: 102.253/24
+      - number: 103
+        name: data-3-default
+        ip: 103.253/24
+      - number: 201
+        name: wlan-1-default
+        ip: 201.253/24
+      - number: 202
+        name: swift1
+        ip: 202.253/24
+    mclags:
+      - lag_id: 1
+        lag_allowed_vlans: 101,201,201
+        connected_device: Stack 1
+      - lag_id: 2
+        lag_allowed_vlans: 101,201,201
+        connected_device: Stack 1
+      - lag_id: 3
+        lag_allowed_vlans: 101,201,201
+        connected_device: Stack 1
+      - lag_id: 4
+        lag_allowed_vlans: 101,201,201
+        connected_device: Stack 1
+    bgp_peers:
+      - neighbor_ip: 10.1.1.1
+        peer_asn: 13
