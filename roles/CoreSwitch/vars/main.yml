@@ -33,8 +33,8 @@ switches:
         vrf_mgmt_ipv6:            # Mgmt IP address IPv6
         ospf_process: 3           # OSPF Process ID
         ospf_loopback: 3          # OSPF Loopback
-        ospfv3_process:       # IPv6 OSPF process ID
-        ospfv3_loopback:     # IPv6 Loopback
+        ospfv3_process:           # IPv6 OSPF process ID
+        ospfv3_loopback:          # IPv6 Loopback
         vrf_ospf_ver: v4          # Enter v4 or v6
       - vrf: vrf-c             # VRF Name
         vrf_rid: 10.2.3.31         # OSPF RID
@@ -79,22 +79,22 @@ switches:
         ospf_process: 8           # OSPF Process ID
         ospf_loopback: 8          # OSPF Loopback
         ospfv3_process:           # IPv6 OSPF process ID
-        ospfv3_loopback:          # IPv6 Loopback
-        vrf_ospf_ver: v4          # Enter v4 or v6
-      - vrf: vrf-h                # VRF Name
-        vrf_rid: 10.5.2.81        # OSPF RID
-        vrf_mgmt_ipv4: 10.3.0.81  # Mgmt IP address IPv6
-        vrf_mgmt_ipv6: 2001:2::81 # Mgmt IP address IPv6
-        ospf_process: 9           # OSPF Process ID
-        ospf_loopback: 9          # OSPF Loopback
-        ospfv3_process: 19        # IPv6 OSPF process ID
-        ospfv3_loopback: 19       # IPv6 Loopback
-        vrf_ospf_ver: v6          # Enter v4 or v6
+        ospfv3_loopback: 
+        vrf_ospf_ver: v4 
+      - vrf: vrf-h
+        vrf_rid: 10.5.2.81
+        vrf_mgmt_ipv4: 10.3.0.81
+        vrf_mgmt_ipv6: 2001:2::81
+        ospf_process: 9
+        ospf_loopback: 9
+        ospfv3_process: 19
+        ospfv3_loopback: 19 
+        vrf_ospf_ver: v6          
     vlan_interfaces:
-      - vlan_if_no: 1002                     #VLAN number
+      - vlan_if_no: 1002                     # VLAN number
         vlan_int_ipv4: 10.3.1.4/31           # VLAN IP interface and Mask
-        vlan_int_ipv6: 2001:6:3::/127   # VLAN Ipv6 interface and Mask (if required or leave "")
-        remote_switch: Core1               # Remote end of link
+        vlan_int_ipv6: 2001:6:3::/127        # VLAN Ipv6 interface and Mask (if required or leave "")
+        remote_switch: Core1                 # Remote end of link
         vrf_ospf_process: 1                  # IPv4 OSPF process ID
         vrf_ospfv3_process: 1                # IPv6 OSPF process ID (if required or leave blank)
         vrf_name: default                    # VRF Name
@@ -111,70 +111,70 @@ switches:
         remote_switch: Core 3
         vrf_ospf_process: 2
         vrf_ospfv3_process:
-        vrf_name: vrf-bce
+        vrf_name: vrf-a
       - vlan_if_no: 1005
         vlan_int_ipv4: 10.3.4.4/31
         vlan_int_ipv6: 2001:7::4/127
         remote_switch: Joule
         vrf_ospf_process: 2
         vrf_ospfv3_process: 8
-        vrf_name: vrf-stu
+        vrf_name: vrf-b
     bgp_rr_peer: # IPv4 Router Refletor Clients on default
       - bgp_ipv4: 10.1.1.2
         bgp_ipv6: 2001:8::2
-        bgp_peer_name: Stopford
+        bgp_peer_name: Core-2
         bgp_remote_as: '65002'
     bgp_rc_peer: # IPv4 Router Refletor Clients on default
       - bgp_ipv4: 10.1.1.3
         bgp_ipv6: 2001:9::3
-        bgp_peer_name: Stopford
+        bgp_peer_name: Core-1
         bgp_remote_as: '65002'
     bgp_ind_peer: # Indivdual IPv4 BGP Peers on default
       - bgp_ipv4: 10.1.1.4
         bgp_ipv6: 2001::4
-        bgp_peer_name: Stopford
+        bgp_peer_name: Core-3
         bgp_remote_as: '65002'
-    bgp_vrf_bce:
+    bgp_vrf_a:
       - bgp_peer_ipv4: 10.1.1.1
         bgp_peer_ipv6: 2001:10::4
-        bgp_peer_name: Stopford
+        bgp_peer_name: Core-4
         bgp_asn: 65001
         peer_type: Dist
       - bgp_peer_ipv4: 10.1.1.2
-        bgp_peer_ipv6:
-        bgp_peer_name: Stopford
+        bgp_peer_ipv6: ""
+        bgp_peer_name: Core-5
         bgp_asn: 65001
         peer_type: Core
-    bgp_vrf_com:
+    bgp_vrf_b:
       - bgp_peer_ipv4: 10.1.1.1
         bgp_peer_ipv6: 2001:11::4
-        bgp_peer_name: Stopford
+        bgp_peer_name: Core-1
         bgp_asn: 65001
         peer_type: Dist
       - bgp_peer_ipv4: 10.1.1.2
-        bgp_peer_ipv6:
-        bgp_peer_name: Stopford
+        bgp_peer_ipv6: ""
+        bgp_peer_name: Core-2
         bgp_asn: 65001
         peer_type: Core
-    bgp_vrf_cct:
+    bgp_vrf_c:
       - bgp_peer_ipv4: 10.1.1.1
         bgp_peer_ipv6: 2001:12:4
-        bgp_peer_name: Stopford
+        bgp_peer_name: Core-1
         bgp_asn: 65001
         peer_type: Dist
       - bgp_peer_ipv4: 10.1.1.2
         bgp_peer_ipv6: ""
-        bgp_peer_name: Stopford
+        bgp_peer_name: Core-2
         bgp_asn: 65001
         peer_type: Core
-    bgp_vrf_pod:
+    bgp_vrf_d:
       - bgp_peer_ipv4: 10.1.1.1
         bgp_peer_ipv6: 2001::4
-        bgp_peer_name: Stopford
+        bgp_peer_name: Core-1
         bgp_asn: 65001
         peer_type: Dist
       - bgp_peer_ipv4: 10.1.1.2
         bgp_peer_ipv6: ""
-        bgp_peer_name: Stopford
+        bgp_peer_name: Core-2
         bgp_asn: 65001
         peer_type: Core
