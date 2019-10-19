@@ -29,7 +29,8 @@ user admin group administrators password plaintext Aruba123
 ssh server vrf mgmt
 interface mgmt
     no shutdown
-    ip static <IP Address>
+    ip static <ip address>
+    default-gateway <ip address>
 https-server rest access-mode read-write
 https-server vrf mgmt
 
