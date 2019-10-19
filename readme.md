@@ -3,10 +3,15 @@ Ansible Scripts to generate and deploy Aruba OS CX Configurations.
 
 Play uses Roles and Variable files to build large configuration, with BGP, IPv4 and IPv6.
 
-currently 2 main plays
+Pre-reqs
+Requires the Aruba-CX modules within the project folder
+1) ansible-galaxy install git+https://github.com/aruba/aoscx-ansible-role.git
+2) TFTP running on the host
 
-CoreSwitchBuild.yml - uses the CoreSwitch roles to build based on a Jinja2 template
-DeployConfig.yml - uses the CoreSwitch roles to build config, the uses the Aruba CX modules to run a tftp command on the switch to upload, followed by an error log output.
+Currenlty Functions
+
+- CoreSwitchBuild.yml - uses the CoreSwitch roles to build based on a Jinja2 template
+- DeployConfig.yml - uses the CoreSwitch roles to build config, the uses the Aruba CX modules to run a tftp command on the switch to upload, followed by an error log output.
 
 To use each, enter the variables for the switches within the vars file,
 
