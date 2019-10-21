@@ -24,7 +24,7 @@ In development
 
 
 The following base configurtion on
-
+```
 user admin group administrators password plaintext Aruba123
 ssh server vrf mgmt
 interface mgmt
@@ -33,7 +33,7 @@ interface mgmt
     default-gateway <ip address>
 https-server rest access-mode read-write
 https-server vrf mgmt
-
+```
 
 Cited Resource to build these script
     # https://github.com/aruba/aoscx-ansible-role
