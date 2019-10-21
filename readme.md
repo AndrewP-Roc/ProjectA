@@ -1,12 +1,12 @@
 
-Ansible Scripts to generate and deploy Aruba OS CX Configurations.
+# Ansible Scripts to generate and deploy Aruba OS CX Configurations.
 
 Play uses Roles and Variable files to build large configuration, with BGP, IPv4 and IPv6.
 
 Pre-reqs
 Requires the Aruba-CX modules within the project folder
-1) ansible-galaxy install git+https://github.com/aruba/aoscx-ansible-role.git
-2) TFTP running on the host
+1. Aruba OS CX module installed https://github.com/aruba/aoscx-ansible-role.git
+2. TFTP running on the host
 
 Currenlty Functions
 
@@ -35,8 +35,8 @@ https-server rest access-mode read-write
 https-server vrf mgmt
 ```
 
-Cited Resource to build these script
-    # https://github.com/aruba/aoscx-ansible-role
-    # http://www.nettinkerer.org/using-ansible-to-create-config-files/
-    # https://github.com/dmahler/ansible-template
-    # https://www.bo-yang.net/2015/08/31/centos7-install-tftp-server
+## Cited Resource to build these script
+* https://github.com/aruba/aoscx-ansible-role
+* http://www.nettinkerer.org/using-ansible-to-create-config-files/
+* https://github.com/dmahler/ansible-template
+* https://www.bo-yang.net/2015/08/31/centos7-install-tftp-server
