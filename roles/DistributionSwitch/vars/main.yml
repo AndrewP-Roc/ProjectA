@@ -1,8 +1,8 @@
 ---
 switches:
-  - ansible_hostname: aglc
+  - ansible_hostname: dist1
     local_password: aruba123
-    system_location: "Alan Gilbert Learning Commons"
+    system_location: "building 1"
     snmp_auth: password1
     snmp_priv: password1
     mgmt_ip: 10.10.0.5
